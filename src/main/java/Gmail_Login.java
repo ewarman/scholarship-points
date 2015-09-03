@@ -186,49 +186,60 @@ public class Gmail_Login {
        }
        
        public static String getPoints(Kappa[] sisterInformation) {
-    	   int inHousePoints = 0, outOfHousePoints = 0;
-    	   int activePoints = 0, pledgePoints = 0;
-    	   int secondDeckPoints = 0, thirdDeckPoints = 0, firstDeckPoints = 0, basementPoints = 0;
+    	   double inHousePoints = 0, outOfHousePoints = 0;
+    	   double activePoints = 0, pledgePoints = 0;
+    	   double secondDeckPoints = 0, thirdDeckPoints = 0, firstDeckPoints = 0, basementPoints = 0;
     	   
+    	   double inHouse = 0, outOfHouse = 0;
+    	   double actives = 0, pledges = 0;
+    	   double secondDeck = 0, thirdDeck = 0, firstDeck = 0, basement = 0;
     	   for(Kappa temp : sisterInformation) {
     		   if (temp.getInHouse() == true) {
     			   inHousePoints += temp.getCount();
+    			   inHouse++;
     		   }
     		   else {
     			   outOfHousePoints += temp.getCount();
+    			   outOfHouse++;
     		   }
     		   
     		   if (temp.getActive() == true) {
     			   activePoints += temp.getCount();
+    			   actives++;
     		   }
     		   else {
     			   pledgePoints += temp.getCount();
+    			   pledges++;
     		   }
     		   
     		   if (temp.getDeck() == 0) {
     			   basementPoints += temp.getCount();
+    			   basement++;
     		   }
     		   else if (temp.getDeck() == 1) {
     			   firstDeckPoints += temp.getCount();
+    			   firstDeck++;
     		   }
     		   else if (temp.getDeck() == 2) {
     			   secondDeckPoints += temp.getCount();
+    			   secondDeck++;
     		   }
     		   else {
     			   thirdDeckPoints += temp.getCount();
+    			   thirdDeck++;
     		   }
     	   }
     	   
     	   return "\nSCHOLARSHIP POINT REPORT:\n\n"
     	   		+ "In House vs. Out of House:\n"
-    	   		+ "In House: "+inHousePoints+" Out of House: "+outOfHousePoints+"\n\n"
+    	   		+ "In House: "+inHousePoints/inHouse+" Out of House: "+outOfHousePoints/outOfHouse+"\n\n"
     	   		+ "Actives vs. Pledges:\n"
-    	   		+ "Actives: "+activePoints+" Pledges: "+pledgePoints+"\n\n"
+    	   		+ "Actives: "+activePoints/actives+" Pledges: "+pledgePoints+"\n\n"
     	   		+ "Deck Wars:\n"
-    	   		+ "Basement: "+basementPoints+"\n"
-    	   		+ "First Deck: "+firstDeckPoints+"\n"
-    	   		+ "Second Deck: "+secondDeckPoints+"\n"
-    	   		+ "Third Deck: "+thirdDeckPoints;
+    	   		+ "Basement: "+basementPoints/basement+"\n"
+    	   		+ "First Deck: "+firstDeckPoints/firstDeck+"\n"
+    	   		+ "Second Deck: "+secondDeckPoints/secondDeck+"\n"
+    	   		+ "Third Deck: "+thirdDeckPoints/thirdDeck;
        }
        
 }
