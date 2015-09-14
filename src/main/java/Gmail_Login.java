@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.io.*;
 
@@ -7,6 +9,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+
+import java.util.HashMap;
 
 public class Gmail_Login {
 /**
@@ -30,7 +34,7 @@ public class Gmail_Login {
         	   br.close();
            }
     	   
-    	   Kappa[] sisterInformation = getSisterInformation();  
+    	   HashMap<String,Kappa> sisterInformation = getSisterInformation();  
     	   List<Email_Class> emailList = runSeleniumGrab(usrnm, pswd);
 		   sisterInformation = attributeEmails(emailList, sisterInformation);
 		   System.out.println(getPoints(sisterInformation));
@@ -113,16 +117,16 @@ public class Gmail_Login {
             return kappas;
        }
        
-       public static Kappa[] getSisterInformation() throws IOException{
+       public static HashMap<String,Kappa> getSisterInformation() throws IOException{
     	   
     	   String firstName;
     	   String lastName;
     	   boolean isActive;
     	   boolean inHouse;
     	   int deck;
-    	   int i = 0;
     	   
-    	   Kappa[] sisterInformation= new Kappa[41];
+    	   HashMap<String,Kappa> sisterInformation = new HashMap<String, Kappa>(41);
+    	   //Kappa[] sisterInformation= new Kappa[41];
     	   BufferedReader br = new BufferedReader(new FileReader("KappaConfig.txt"));
     	   try {
     		   
@@ -135,8 +139,8 @@ public class Gmail_Login {
     			   isActive = Boolean.parseBoolean(st.nextToken());
     			   inHouse = Boolean.parseBoolean(st.nextToken());
     			   deck = Integer.parseInt(st.nextToken());
-    			   sisterInformation[i] = new Kappa(firstName+" "+lastName, isActive, inHouse, deck);
-    			   i++;
+    			   sisterInformation.put(firstName+" "+lastName, new Kappa(isActive, inHouse, deck));
+    			   //sisterInformation[i] = new Kappa(firstName+" "+lastName, isActive, inHouse, deck);
     			   line = br.readLine();
     			   if (line == null) {
     				   break;
@@ -152,40 +156,20 @@ public class Gmail_Login {
     	   return sisterInformation;
        }
        
-       public static Kappa[] attributeEmails(List<Email_Class> emailList, Kappa[] sisterInformation) {
-    	   int start = 0;
-		   int end = sisterInformation.length - 1;
-		   int middle = 21;
-		   String [] part = sisterInformation[middle].getName().split(" ");
-		   char middleLetter = part[1].charAt(0);
-		   
+       public static HashMap<String,Kappa> attributeEmails(List<Email_Class> emailList, HashMap<String,Kappa>sisterInformation) {
     	   for (Email_Class temp : emailList) {
-    		   String[] parts = temp.getName().split(" ");
-    		   //if first half of alphabet
-    		   if (parts[1].charAt(0) < middleLetter) {
-    			   //look only in first half of alphabet
-    			   for (int i = start; i < middle; i++) {
-    				   //if names are the same
-    				   if (temp.getName().equals(sisterInformation[i].getName())) {
-    					   //set the sister's score to the number of emails found
-    					   sisterInformation[i].setCount(temp.getCount());
-    				   }
-    			   }
-    		   }
-    		   //else look in second half
-    		   else{
-    			   for (int i = middle; i < end; i++) {
-    				   if (temp.getName().equals(sisterInformation[i].getName())) {
-    					   sisterInformation[i].setCount(temp.getCount());
-    				   }
-    			   }
-    		   }
+    		   String name = temp.getName();
+    		   if (sisterInformation.containsKey(name)) {
+    			   Kappa t = sisterInformation.get(name);
+    			   t.incrementCount();
+    			   sisterInformation.put(name, t);
+    		   } else System.out.println(name+" not found in directory");
     	   }
     	   
     	   return sisterInformation;
        }
        
-       public static String getPoints(Kappa[] sisterInformation) {
+       public static String getPoints(HashMap<String,Kappa> sisterInformation) {
     	   double inHousePoints = 0, outOfHousePoints = 0;
     	   double activePoints = 0, pledgePoints = 0;
     	   double secondDeckPoints = 0, thirdDeckPoints = 0, firstDeckPoints = 0, basementPoints = 0;
@@ -193,39 +177,39 @@ public class Gmail_Login {
     	   double inHouse = 0, outOfHouse = 0;
     	   double actives = 0, pledges = 0;
     	   double secondDeck = 0, thirdDeck = 0, firstDeck = 0, basement = 0;
-    	   for(Kappa temp : sisterInformation) {
-    		   if (temp.getInHouse() == true) {
-    			   inHousePoints += temp.getCount();
+    	   for(Kappa value : sisterInformation.values()) {
+    		   if (value.getInHouse() == true) {
+    			   inHousePoints += value.getCount();
     			   inHouse++;
     		   }
     		   else {
-    			   outOfHousePoints += temp.getCount();
+    			   outOfHousePoints += value.getCount();
     			   outOfHouse++;
     		   }
     		   
-    		   if (temp.getActive() == true) {
-    			   activePoints += temp.getCount();
+    		   if (value.getActive() == true) {
+    			   activePoints += value.getCount();
     			   actives++;
     		   }
     		   else {
-    			   pledgePoints += temp.getCount();
+    			   pledgePoints += value.getCount();
     			   pledges++;
     		   }
     		   
-    		   if (temp.getDeck() == 0) {
-    			   basementPoints += temp.getCount();
+    		   if (value.getDeck() == 0) {
+    			   basementPoints += value.getCount();
     			   basement++;
     		   }
-    		   else if (temp.getDeck() == 1) {
-    			   firstDeckPoints += temp.getCount();
+    		   else if (value.getDeck() == 1) {
+    			   firstDeckPoints += value.getCount();
     			   firstDeck++;
     		   }
-    		   else if (temp.getDeck() == 2) {
-    			   secondDeckPoints += temp.getCount();
+    		   else if (value.getDeck() == 2) {
+    			   secondDeckPoints += value.getCount();
     			   secondDeck++;
     		   }
     		   else {
-    			   thirdDeckPoints += temp.getCount();
+    			   thirdDeckPoints += value.getCount();
     			   thirdDeck++;
     		   }
     	   }
