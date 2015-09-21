@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -38,6 +39,7 @@ public class Gmail_Login {
     	   List<Email_Class> emailList = runSeleniumGrab(usrnm, pswd);
 		   sisterInformation = attributeEmails(emailList, sisterInformation);
 		   System.out.println(getPoints(sisterInformation));
+		   //getDeckTeams(sisterInformation);
 
        }
        
@@ -126,7 +128,6 @@ public class Gmail_Login {
     	   int deck;
     	   
     	   HashMap<String,Kappa> sisterInformation = new HashMap<String, Kappa>(41);
-    	   //Kappa[] sisterInformation= new Kappa[41];
     	   BufferedReader br = new BufferedReader(new FileReader("KappaConfig.txt"));
     	   try {
     		   
@@ -140,7 +141,6 @@ public class Gmail_Login {
     			   inHouse = Boolean.parseBoolean(st.nextToken());
     			   deck = Integer.parseInt(st.nextToken());
     			   sisterInformation.put(firstName+" "+lastName, new Kappa(isActive, inHouse, deck));
-    			   //sisterInformation[i] = new Kappa(firstName+" "+lastName, isActive, inHouse, deck);
     			   line = br.readLine();
     			   if (line == null) {
     				   break;
@@ -157,15 +157,27 @@ public class Gmail_Login {
        }
        
        public static HashMap<String,Kappa> attributeEmails(List<Email_Class> emailList, HashMap<String,Kappa>sisterInformation) {
+    	   Scanner scan = new Scanner(System.in);
     	   for (Email_Class temp : emailList) {
     		   String name = temp.getName();
     		   if (sisterInformation.containsKey(name)) {
     			   Kappa t = sisterInformation.get(name);
     			   t.incrementCount();
     			   sisterInformation.put(name, t);
-    		   } else System.out.println(name+" not found in directory");
-    	   }
-    	   
+    		   } 
+    		   else {
+    			   System.out.println(name+" not found in directory");
+    			   String manualAttempt = scan.nextLine();
+        		   if (sisterInformation.containsKey(manualAttempt)) {
+        			   System.out.println("Manual classification successful");
+        			   Kappa t = sisterInformation.get(manualAttempt);
+        			   t.incrementCount();
+        			   sisterInformation.put(name, t);
+        		   }
+        		   else System.out.println(manualAttempt+" not found in directory, skipping");
+    		   }
+    	   } 
+    	   scan.close();
     	   return sisterInformation;
        }
        
@@ -213,7 +225,7 @@ public class Gmail_Login {
     			   thirdDeck++;
     		   }
     	   }
-    	   
+
     	   return "\nSCHOLARSHIP POINT REPORT:\n\n"
     	   		+ "In House vs. Out of House:\n"
     	   		+ "In House: "+inHousePoints/inHouse+" Out of House: "+outOfHousePoints/outOfHouse+"\n\n"
@@ -224,6 +236,15 @@ public class Gmail_Login {
     	   		+ "First Deck: "+firstDeckPoints/firstDeck+"\n"
     	   		+ "Second Deck: "+secondDeckPoints/secondDeck+"\n"
     	   		+ "Third Deck: "+thirdDeckPoints/thirdDeck;
+       }
+       
+       public static void getDeckTeams(HashMap<String,Kappa> sisterInformation) {
+    	   for (String name : sisterInformation.keySet()) {
+    		   if (sisterInformation.get(name).getDeck() < 2) {
+    			   System.out.print(name);
+    			   System.out.println(" "+sisterInformation.get(name).getDeck());
+    		   }
+    	   }
        }
        
 }
